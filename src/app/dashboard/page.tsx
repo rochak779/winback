@@ -5,7 +5,7 @@
 // pass comes later from the designer; this just surfaces real data:
 // the org's tracked companies (src/data/target's onboarding-created
 // `companies` rows) and the documents uploaded against each in Supabase
-// Storage's `company-documents` bucket. No extraction pipeline wiring yet —
+// Storage's `winback-documents` bucket. No extraction pipeline wiring yet —
 // see docs/superpowers/specs/2026-09-05-auth-onboarding-foundation-design.md.
 // ============================================================================
 
@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { DOCUMENTS_BUCKET } from '@/lib/supabase/schema';
 import { getUserOrgs } from '@/lib/org/membership';
 
 interface CompanyRow {
@@ -51,7 +52,7 @@ export default function DashboardPage() {
       const { data: companyRows } = await supabase.from('companies').select('id, name').eq('org_id', org.orgId);
       const rows: CompanyRow[] = [];
       for (const company of companyRows ?? []) {
-        const { data: files } = await supabase.storage.from('company-documents').list(`${org.orgId}/${company.id}`);
+        const { data: files } = await supabase.storage.from(DOCUMENTS_BUCKET).list(`${org.orgId}/${company.id}`);
         rows.push({ id: company.id, name: company.name, files: (files ?? []).map((file) => file.name) });
       }
       if (!cancelled) {

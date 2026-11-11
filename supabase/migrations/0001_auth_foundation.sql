@@ -43,14 +43,14 @@ alter table invites enable row level security;
 alter table companies enable row level security;
 
 create function is_org_member(p_org_id uuid) returns boolean
-  language sql security definer stable as $$
+  language sql security definer stable set search_path = winback, extensions, pg_temp as $$
   select exists (
     select 1 from org_members where org_id = p_org_id and user_id = auth.uid()
   );
 $$;
 
 create function is_org_admin(p_org_id uuid) returns boolean
-  language sql security definer stable as $$
+  language sql security definer stable set search_path = winback, extensions, pg_temp as $$
   select exists (
     select 1 from org_members where org_id = p_org_id and user_id = auth.uid() and role = 'admin'
   );
@@ -85,7 +85,7 @@ create policy "companies: admins write" on companies for insert
 
 create function get_invite_preview(p_token uuid)
 returns table (org_name text, email text, role text, status text)
-language sql security definer stable as $$
+language sql security definer stable set search_path = winback, extensions, pg_temp as $$
   select orgs.name, invites.email, invites.role, invites.status
   from invites join orgs on orgs.id = invites.org_id
   where invites.id = p_token and invites.expires_at > now();
@@ -93,7 +93,7 @@ $$;
 
 create function accept_invite(p_token uuid)
 returns table (org_id uuid)
-language plpgsql security definer as $$
+language plpgsql security definer set search_path = winback, extensions, pg_temp as $$
 declare v_org_id uuid; v_role text;
 begin
   select invites.org_id, invites.role into v_org_id, v_role

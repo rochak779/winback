@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "validate:data": "tsx scripts/validate-data.ts",
-    "record:golden": "tsx scripts/record-golden.ts"
+    "record:golden": "tsx scripts/record-golden.ts",
+    "db:migrate": "scripts/db-migrate.sh"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
