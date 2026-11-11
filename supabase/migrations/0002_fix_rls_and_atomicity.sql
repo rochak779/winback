@@ -7,7 +7,7 @@
 --      so it degenerated to "the whole org_members table is empty" — only the very
 --      first user of the deployment could ever onboard, and while the table was
 --      empty anyone could self-insert as admin into any org.
---   2. All SECURITY DEFINER functions pin search_path = public (hijack vector).
+--   2. All SECURITY DEFINER functions pin search_path (hijack vector).
 --   3. accept_invite now checks the invite's email against the accepting user's
 --      JWT email, so a forwarded invite link cannot be redeemed by someone else.
 --   4. Index on org_members(user_id) for the getUserOrgs lookup.
@@ -15,7 +15,7 @@
 -- 1. Atomic org creation ------------------------------------------------------
 
 create or replace function create_org(p_name text) returns uuid
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = winback, extensions, pg_temp as $$
 declare v_org_id uuid;
 begin
   if auth.uid() is null then raise exception 'not_authenticated'; end if;
@@ -32,14 +32,14 @@ create policy "org_members: admins write" on org_members for insert
 -- 2. Pin search_path on every SECURITY DEFINER function ------------------------
 
 create or replace function is_org_member(p_org_id uuid) returns boolean
-  language sql security definer stable set search_path = public as $$
+  language sql security definer stable set search_path = winback, extensions, pg_temp as $$
   select exists (
     select 1 from org_members where org_id = p_org_id and user_id = auth.uid()
   );
 $$;
 
 create or replace function is_org_admin(p_org_id uuid) returns boolean
-  language sql security definer stable set search_path = public as $$
+  language sql security definer stable set search_path = winback, extensions, pg_temp as $$
   select exists (
     select 1 from org_members where org_id = p_org_id and user_id = auth.uid() and role = 'admin'
   );
@@ -47,7 +47,7 @@ $$;
 
 create or replace function get_invite_preview(p_token uuid)
 returns table (org_name text, email text, role text, status text)
-language sql security definer stable set search_path = public as $$
+language sql security definer stable set search_path = winback, extensions, pg_temp as $$
   select orgs.name, invites.email, invites.role, invites.status
   from invites join orgs on orgs.id = invites.org_id
   where invites.id = p_token and invites.expires_at > now();
@@ -59,7 +59,7 @@ $$;
 
 create or replace function accept_invite(p_token uuid)
 returns table (org_id uuid)
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = winback, extensions, pg_temp as $$
 declare v_org_id uuid; v_role text;
 begin
   select invites.org_id, invites.role into v_org_id, v_role
