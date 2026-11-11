@@ -2,10 +2,11 @@
 
 **First-pass diligence for private equity deal teams: read the whole data room, cross-check management's claims, and cite the evidence for every finding.**
 
-[Live app →](https://winback-1.vercel.app)
+**Built independently by Rochak Agarwal:** product concept, design and implementation.
 
-<!-- TODO(Rochak): the live app is behind sign-in, so add a screenshot of a deal's crosscheck or analysis screen at docs/readme/screenshot.png, then uncomment the line below. -->
-<!-- ![WinBack crosscheck findings linked to source documents](docs/readme/screenshot.png) -->
+[Live app →](https://winback-1.vercel.app) · [Watch the demo →](https://youtu.be/AXVH13EHEqU)
+
+![WinBack crosscheck findings linked to source documents](docs/readme/screenshot.png)
 
 ## The problem
 
@@ -51,5 +52,12 @@ That's where deals go wrong: not in the headline numbers everyone reads, but in 
 <summary><strong>Tech stack</strong></summary>
 
 Next.js (App Router), TypeScript, Tailwind CSS with shadcn/ui, Supabase (Auth, Postgres), Vitest, pnpm, deployed on Vercel.
+
+</details>
+
+<details>
+<summary><strong>Database</strong></summary>
+
+WinBack runs on a Supabase project shared with other hobby apps, inside its own `winback` schema, with documents in the `winback-documents` storage bucket. Apply migrations only with `pnpm db:migrate`, never `supabase db push`. The rules every app on the shared project follows are in [`docs/shared-supabase-db.md`](docs/shared-supabase-db.md).
 
 </details>
