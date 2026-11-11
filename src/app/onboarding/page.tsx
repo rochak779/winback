@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { DOCUMENTS_BUCKET } from '@/lib/supabase/schema';
 import { createOrgForUser } from '@/lib/org/membership';
 import { createInvite } from '@/lib/org/invites';
 
@@ -114,7 +115,7 @@ export default function OnboardingPage() {
     try {
       for (const file of Array.from(fileList)) {
         const path = `${orgId}/${companyId}/${file.name}`;
-        const { error: uploadError } = await supabase.storage.from('company-documents').upload(path, file, { upsert: true });
+        const { error: uploadError } = await supabase.storage.from(DOCUMENTS_BUCKET).upload(path, file, { upsert: true });
         if (uploadError) throw new Error(uploadError.message);
       }
       const names = Array.from(fileList).map((file) => file.name);

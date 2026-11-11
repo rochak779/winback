@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { signUpWithRedirect } from '@/lib/auth/sign-up';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 export default function SignUpPage() {
@@ -22,7 +23,7 @@ export default function SignUpPage() {
     setError(null);
     setNotice(null);
     const supabase = createBrowserSupabaseClient();
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+    const { data, error: signUpError } = await signUpWithRedirect(supabase, email, password, window.location.origin);
     setPending(false);
     if (signUpError) {
       setError(signUpError.message);
