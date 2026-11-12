@@ -10,7 +10,6 @@
 
 import { ArrowDownIcon, ArrowUpIcon, EqualIcon, MinusIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DerivedMarker } from '@/components/audit/derived-marker';
@@ -63,11 +62,9 @@ function DirectionChip({ direction }: { direction: BenchmarkRow['direction'] }) 
 
 export function BenchmarkPanel({ benchmark }: { benchmark: BenchmarkResult }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Benchmark</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <section className="space-y-5 border-t-2 border-rule pt-5 animate-in fade-in duration-300">
+      <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Benchmark</h2>
+      <div className="space-y-5">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -91,8 +88,8 @@ export function BenchmarkPanel({ benchmark }: { benchmark: BenchmarkResult }) {
             <TableBody>
               {benchmark.rows.map((row) => (
                 <TableRow key={row.metric}>
-                  <TableCell className="font-medium">{row.label}</TableCell>
-                  <TableCell className="text-right font-bold text-base tabular-nums text-foreground">
+                  <TableCell className="font-medium whitespace-normal">{row.label}</TableCell>
+                  <TableCell className="text-right font-heading text-lg font-semibold tabular-nums text-foreground">
                     {row.targetValue === null ? (
                       <Tooltip>
                         <TooltipTrigger render={<span className="cursor-default text-muted-foreground" tabIndex={0} />}>—</TooltipTrigger>
@@ -134,14 +131,18 @@ export function BenchmarkPanel({ benchmark }: { benchmark: BenchmarkResult }) {
           </Table>
         </div>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="max-w-[72ch] text-xs leading-relaxed text-muted-foreground">
           &ldquo;Above&rdquo;, &ldquo;below&rdquo;, and &ldquo;in line with&rdquo; describe the target&apos;s position against the peer
           median only — they are not an assessment of quality. An above-median EV/EBITDA means the target is priced richer than its
           peers, not that it is a better business.
         </p>
 
-        {benchmark.commentary && <p className="border-t pt-4 text-sm">{benchmark.commentary}</p>}
-      </CardContent>
-    </Card>
+        {benchmark.commentary && (
+          <p className="max-w-[68ch] border-t border-border pt-5 font-heading text-[1.0625rem] leading-relaxed">
+            {benchmark.commentary}
+          </p>
+        )}
+      </div>
+    </section>
   );
 }

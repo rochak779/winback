@@ -1,19 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { ComingSoonWorkstream } from '@/lib/contracts/types';
 
+/** A workstream outside this release: present for scope, visibly inert. */
 export function ComingSoonCard({ item }: { item: ComingSoonWorkstream }) {
   return (
-    <Card className="opacity-50 grayscale bg-muted/50 cursor-not-allowed">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-sm">{item.label}</CardTitle>
-          <Badge variant="outline">Not in this release</Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-xs text-muted-foreground">{item.description}</p>
-      </CardContent>
-    </Card>
+    <div className="space-y-1.5 border-t border-border pt-3 text-muted-foreground" aria-disabled="true">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="font-heading text-base font-semibold text-foreground/60">{item.label}</p>
+        <span className="shrink-0 text-[0.6875rem]">Not in this release</span>
+      </div>
+      <p className="text-xs leading-relaxed">{item.description}</p>
+    </div>
   );
 }

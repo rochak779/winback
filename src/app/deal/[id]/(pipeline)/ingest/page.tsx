@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { DocumentCard } from '@/components/ingest/document-card';
 import { ProfileView } from '@/components/ingest/profile-view';
+import { EmptyNote, ErrorNote, PageHeader, StatusNote } from '@/components/app-shell/page-header';
 import { fetchDocs, runExtract } from '@/lib/client/api';
 import { useRun, useStage } from '@/lib/store/RunProvider';
 import type { SourceDocId } from '@/lib/contracts/types';
@@ -28,9 +29,7 @@ function LoadingBanner() {
     return () => clearInterval(id);
   }, []);
   return (
-    <div className="rounded-lg border bg-muted/40 px-4 py-3 text-sm text-muted-foreground" role="status">
-      {LOADING_COPY[i] ?? LOADING_COPY[0]}
-    </div>
+    <StatusNote>{LOADING_COPY[i] ?? LOADING_COPY[0]}</StatusNote>
   );
 }
 
@@ -47,21 +46,27 @@ export default function IngestPage() {
 
   if (run.docs.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-3">
-        <p className="text-sm text-muted-foreground">The target&apos;s documents haven&apos;t loaded yet.</p>
-        <Button onClick={() => void fetchDocs(dispatch)}>Load documents</Button>
-      </div>
+      <EmptyNote title="Documents not loaded" action={<Button onClick={() => void fetchDocs(dispatch)}>Load documents</Button>}>
+        The target&apos;s documents haven&apos;t loaded yet.
+      </EmptyNote>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-xl font-semibold tracking-tight">Ingest</h1>
-        <p className="text-sm text-muted-foreground">Four diligence documents, loaded and ready to extract.</p>
-      </div>
+    <div className="space-y-10">
+      <PageHeader
+        title="Ingest"
+        description="Four diligence documents, loaded and ready to extract."
+        aside={
+          extractStage.status === 'idle' && (
+            <Button size="lg" onClick={handleExtract}>
+              Run extraction
+            </Button>
+          )
+        }
+      />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {run.docs.map((doc) => (
           <DocumentCard
             key={doc.id}
@@ -72,19 +77,17 @@ export default function IngestPage() {
         ))}
       </div>
 
-      {extractStage.status === 'idle' && (
-        <Button onClick={handleExtract}>Run extraction</Button>
-      )}
-
       {extractStage.status === 'running' && <LoadingBanner key={run.stages.extract.startedAt} />}
 
       {extractStage.status === 'error' && (
-        <div className="flex flex-col items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          <p>{extractStage.error?.message ?? 'Extraction failed.'}</p>
-          <Button variant="outline" size="sm" onClick={handleExtract}>
-            Retry
-          </Button>
-        </div>
+        <ErrorNote
+          message={extractStage.error?.message ?? 'Extraction failed.'}
+          action={
+            <Button variant="outline" size="sm" onClick={handleExtract}>
+              Retry
+            </Button>
+          }
+        />
       )}
 
       {run.extraction && extractStage.status === 'done' && (
@@ -96,9 +99,11 @@ export default function IngestPage() {
             </p>
           )}
           <ProfileView profile={run.extraction.profile} />
-          <Button nativeButton={false} render={<Link href={`/deal/${run.id}/analysis`} />}>
-            Continue to analysis →
-          </Button>
+          <div className="border-t border-border pt-6">
+            <Button size="lg" nativeButton={false} render={<Link href={`/deal/${run.id}/analysis`} />}>
+              Continue to analysis →
+            </Button>
+          </div>
         </>
       )}
     </div>

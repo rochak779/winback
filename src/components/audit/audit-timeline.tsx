@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmptyNote, ErrorNote } from '@/components/app-shell/page-header';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AuditListResponseSchema } from '@/lib/contracts/schemas';
 import type { AuditAction, AuditEntry } from '@/lib/contracts/types';
@@ -19,9 +20,9 @@ import { AUDIT_ACTION_LABEL, ACTOR_LABEL } from '@/lib/labels';
 const ACTOR_FILTERS = ['all', 'system', 'model', 'analyst'] as const;
 
 function actorBadgeClass(actor: AuditEntry['actor']): string {
-  if (actor === 'analyst') return 'border-primary/40 bg-primary/15 text-primary';
-  if (actor === 'model') return 'border-attention/40 bg-attention/15 text-attention-foreground';
-  return 'border-border bg-muted text-muted-foreground';
+  if (actor === 'analyst') return 'border-primary bg-primary text-primary-foreground';
+  if (actor === 'model') return 'border-attention/50 bg-highlight text-attention-foreground';
+  return 'border-input bg-card text-muted-foreground';
 }
 
 export function AuditTimeline({ runId }: { runId: string }) {
@@ -58,22 +59,22 @@ export function AuditTimeline({ runId }: { runId: string }) {
     window.open(`/api/runs/${runId}/audit/export`, '_blank');
   }
 
-  if (error) return <p className="text-sm text-muted-foreground">{error}</p>;
+  if (error) return <ErrorNote message={error} />;
   if (entries === null) return <p className="text-sm text-muted-foreground">Loading…</p>;
 
   const visible = actorFilter === 'all' ? entries : entries.filter((e) => e.actor === actorFilter);
 
   if (entries.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        No activity yet. Every extraction, comparison, and analyst decision will be recorded here.
-      </p>
+      <EmptyNote title="No activity yet">
+        Every extraction, comparison, and analyst decision will be recorded here.
+      </EmptyNote>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
         <Select value={actorFilter} onValueChange={(v) => setActorFilter(v as (typeof ACTOR_FILTERS)[number])}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder="Actor" />
@@ -107,21 +108,27 @@ export function AuditTimeline({ runId }: { runId: string }) {
       {visible.length === 0 ? (
         <p className="text-sm text-muted-foreground">No entries match the current filters.</p>
       ) : (
-        <ul className="space-y-2">
+        <ol className="relative space-y-0 border-l border-border pl-6">
           {visible.map((entry) => (
-            <li key={entry.id} className="rounded-lg border px-3 py-2">
+            <li key={entry.id} className="relative border-b border-border py-4 last:border-b-0">
+              <span
+                aria-hidden="true"
+                className={`absolute top-[1.4rem] -left-[1.8rem] size-2.5 rounded-full border-2 border-paper ${
+                  entry.actor === 'analyst' ? 'bg-primary' : entry.actor === 'model' ? 'bg-attention' : 'bg-input'
+                }`}
+              />
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span>{new Date(entry.at).toLocaleString()}</span>
+                <span className="tabular-nums">{new Date(entry.at).toLocaleString()}</span>
                 <Badge variant="outline" className={actorBadgeClass(entry.actor)}>
                   {ACTOR_LABEL[entry.actor]}
                 </Badge>
-                <span>{AUDIT_ACTION_LABEL[entry.action] ?? entry.action}</span>
+                <span className="font-medium text-foreground">{AUDIT_ACTION_LABEL[entry.action] ?? entry.action}</span>
                 {entry.stage && <span>· {entry.stage}</span>}
               </div>
-              {entry.statementText && <p className="mt-1 text-sm">{entry.statementText}</p>}
+              {entry.statementText && <p className="mt-2 max-w-[75ch] text-sm leading-relaxed">{entry.statementText}</p>}
               {entry.note && <p className="mt-1 text-sm text-muted-foreground">{entry.note}</p>}
               {(entry.before || entry.after) && (
-                <div className="mt-1 grid grid-cols-2 gap-2 text-xs">
+                <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
                   {entry.before && (
                     <p className="text-muted-foreground">
                       <span className="font-medium">Before:</span> {entry.before}
@@ -135,8 +142,8 @@ export function AuditTimeline({ runId }: { runId: string }) {
                 </div>
               )}
               {entry.provenance && (
-                <details className="mt-1 text-xs text-muted-foreground">
-                  <summary className="cursor-pointer">Provenance</summary>
+                <details className="mt-2 text-xs text-muted-foreground [&>p]:font-mono [&>p]:text-[0.6875rem]">
+                  <summary className="cursor-pointer font-medium text-foreground/80 hover:text-foreground">Provenance</summary>
                   <p>Produced by: {entry.provenance.producedBy}</p>
                   <p>Prompt version: {entry.provenance.promptVersion ?? '—'}</p>
                   <p>Input hash: {entry.provenance.inputHash}</p>
@@ -145,7 +152,7 @@ export function AuditTimeline({ runId }: { runId: string }) {
               )}
             </li>
           ))}
-        </ul>
+        </ol>
       )}
     </div>
   );

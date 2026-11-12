@@ -12,9 +12,9 @@ import { Button } from '@/components/ui/button';
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-3 py-24 text-center">
-      <h1 className="font-heading text-lg font-medium">Something went wrong</h1>
-      <p className="text-sm text-muted-foreground">
+    <div className="mx-auto flex max-w-lg flex-col items-start gap-4 border-t-2 border-rule px-4 pt-6 pb-24 sm:mt-16">
+      <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em]">Something went wrong</h1>
+      <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
         {error.message || 'An unexpected error occurred while rendering this page.'}
       </p>
       <Button onClick={reset}>Retry</Button>

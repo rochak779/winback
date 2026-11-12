@@ -15,7 +15,7 @@ export function DerivedMarker({ formula, inputs, className }: { formula: string;
     <Popover>
       <PopoverTrigger
         className={cn(
-          'inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-[10px] font-serif italic text-muted-foreground transition-colors hover:border-attention hover:text-attention-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+          'inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-input bg-card font-serif text-[10px] font-normal tracking-normal italic text-muted-foreground transition-colors hover:border-attention hover:bg-highlight hover:text-attention-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
           className,
         )}
         aria-label="Show how this value was derived"
@@ -23,7 +23,7 @@ export function DerivedMarker({ formula, inputs, className }: { formula: string;
         ƒ
       </PopoverTrigger>
       <PopoverContent>
-        <p className="font-medium">{formula}</p>
+        <p className="font-heading text-base font-semibold">{formula}</p>
         <p className="mt-1 text-xs text-muted-foreground">Computed · deterministic</p>
         <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
           {inputs.map((input) => (

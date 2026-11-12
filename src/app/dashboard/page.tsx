@@ -1,8 +1,7 @@
 // ============================================================================
 // src/app/dashboard/page.tsx — Dashboard
 //
-// Landing page after sign-in/onboarding. Basic UI only — the visual design
-// pass comes later from the designer; this just surfaces real data:
+// Landing page after sign-in/onboarding. Surfaces real data:
 // the org's tracked companies (src/data/target's onboarding-created
 // `companies` rows) and the documents uploaded against each in Supabase
 // Storage's `winback-documents` bucket. No extraction pipeline wiring yet —
@@ -14,7 +13,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
+import { FileTextIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyNote, PageHeader } from '@/components/app-shell/page-header';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { DOCUMENTS_BUCKET } from '@/lib/supabase/schema';
 import { getUserOrgs } from '@/lib/org/membership';
@@ -68,39 +70,50 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold tracking-tight">Dashboard</h1>
-          {orgName && <p className="text-sm text-muted-foreground">{orgName}</p>}
-        </div>
-        <Link href="/plan" className={buttonVariants()}>New deal →</Link>
-      </div>
+    <div className="space-y-12">
+      <PageHeader
+        title="Dashboard"
+        description={orgName ? `${orgName}: companies you track and the documents on file for each.` : undefined}
+        aside={
+          <Link href="/plan" className={buttonVariants({ size: 'lg' })}>
+            New deal →
+          </Link>
+        }
+      />
 
-      {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {loading && (
+        <div className="grid gap-5 sm:grid-cols-2" role="status" aria-label="Loading companies">
+          <Skeleton className="h-36" />
+          <Skeleton className="h-36" />
+        </div>
+      )}
 
       {!loading && companies.length === 0 && (
-        <Card>
-          <CardContent className="py-8 text-center text-sm text-muted-foreground">
-            No companies tracked yet.
-          </CardContent>
-        </Card>
+        <EmptyNote title="No companies tracked yet" className="border-t-0 pt-0">
+          Companies you add during onboarding appear here with their uploaded documents.
+        </EmptyNote>
       )}
 
       {!loading && companies.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {companies.map((company) => (
             <Card key={company.id}>
               <CardHeader>
-                <CardTitle className="text-base">{company.name}</CardTitle>
+                <CardTitle className="text-xl">{company.name}</CardTitle>
+                <p className="text-xs text-muted-foreground tabular-nums">
+                  {company.files.length} {company.files.length === 1 ? 'document' : 'documents'}
+                </p>
               </CardHeader>
               <CardContent>
                 {company.files.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No documents uploaded yet.</p>
                 ) : (
-                  <ul className="space-y-1 text-sm text-muted-foreground">
+                  <ul className="divide-y divide-border border-y border-border text-sm">
                     {company.files.map((fileName) => (
-                      <li key={fileName}>{fileName}</li>
+                      <li key={fileName} className="flex items-center gap-2 py-2">
+                        <FileTextIcon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                        <span className="truncate">{fileName}</span>
+                      </li>
                     ))}
                   </ul>
                 )}

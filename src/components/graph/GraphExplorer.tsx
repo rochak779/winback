@@ -73,16 +73,15 @@ export function GraphExplorer({ docs, historical, initialSessionId }: {
   const selectedLinks = graph?.edges.filter((edge) => edge.source === selected?.id || edge.target === selected?.id) ?? [];
 
   return <div className={`${styles.root} mx-auto max-w-screen-2xl`}>
-    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <header className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b-2 border-rule pb-6">
       <div>
-        <p className="mb-2 text-sm font-medium text-muted-foreground">WinBack · Evidence and connections</p>
-        <h1 className="text-3xl font-semibold tracking-tight">Knowledge graph</h1>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">Explore the sources, counterparties and findings behind each deal. Hover or focus a node to isolate its neighbourhood.</p>
+                <h1 className="font-heading text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.02em] sm:text-[2.75rem]">Knowledge graph</h1>
+        <p className="mt-2.5 max-w-3xl text-[0.9375rem] leading-relaxed text-muted-foreground">Explore the sources, counterparties and findings behind each deal. Hover or focus a node to isolate its neighbourhood.</p>
       </div>
-      <Link href="/" className="text-sm underline underline-offset-4">Back to WinBack</Link>
+      <Link href="/dashboard" className="text-sm underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground">Back to dashboard</Link>
     </header>
 
-    {historical && <aside className="mb-6 rounded-lg border bg-muted p-4 text-sm" aria-label="Historical data notice">
+    {historical && <aside className="mb-6 rounded-sm border border-attention/40 bg-highlight/40 p-4 text-sm" aria-label="Historical data notice">
       <strong>Seeded historical examples.</strong> These two fictional completed deals reuse illustrative financials. They are not live pipeline results or your saved analyses. Blackwood Regional Health Network and Cascade Growth Partners also appear in the Kestrel target documents.
     </aside>}
 
@@ -92,7 +91,7 @@ export function GraphExplorer({ docs, historical, initialSessionId }: {
         <Button variant={scope === 'all' ? 'default' : 'outline'} aria-pressed={scope === 'all'} onClick={() => changeScope('all')}>All my deals</Button>
       </div>
       {historical && <label className="flex items-center gap-2 text-sm">Historical deal
-        <select className="rounded-lg border bg-background p-2" value={sessionId} onChange={(event) => {
+        <select className="h-10 rounded-sm border border-input bg-card px-2" value={sessionId} onChange={(event) => {
           setSessionId(event.target.value); setSelected(null); setFocusId(null);
           setScope('session'); setState({ status: 'loading' });
         }}>
@@ -104,8 +103,8 @@ export function GraphExplorer({ docs, historical, initialSessionId }: {
       {graph && <p className="ml-auto text-sm tabular-nums text-muted-foreground">{visibleGraph?.nodes.length} / {graph.stats.nodeCount} nodes · {graph.stats.sessionCount} deals · {graph.stats.sharedEntityCount} shared entities · {graph.stats.contradictionCount} inconsistencies</p>}
     </div>
 
-    <div className="grid grid-cols-[minmax(0,1fr)_18rem] gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-      <section className="min-w-0 overflow-hidden rounded-xl border bg-card" aria-label="Graph visualization" aria-busy={state.status === 'loading'}>
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] xl:grid-cols-[minmax(0,1fr)_20rem]">
+      <section className="min-w-0 overflow-hidden rounded-md border border-border bg-card shadow-sheet" aria-label="Graph visualization" aria-busy={state.status === 'loading'}>
         {state.status === 'loading' && <p role="status" className="p-8 text-muted-foreground">Connecting the cited sources and findings…</p>}
         {state.status === 'error' && <div role="alert" className="space-y-4 p-8">
           <p>{state.message}</p>
@@ -121,7 +120,7 @@ export function GraphExplorer({ docs, historical, initialSessionId }: {
       </section>
 
       <aside className="min-w-0 space-y-5" aria-label="Graph controls and node details">
-        <section className="rounded-xl border p-4">
+        <section className="rounded-md border border-border bg-card p-4">
           <label htmlFor="graph-search" className="mb-2 block text-sm font-medium">Find a connection</label>
           <Input id="graph-search" placeholder="Search node labels…" value={search} onChange={(event) => setSearch(event.target.value)} disabled={!graph} />
           {search.trim() && <ul className="mt-2 max-h-56 space-y-1 overflow-y-auto" aria-label="Search results">
@@ -133,7 +132,7 @@ export function GraphExplorer({ docs, historical, initialSessionId }: {
           </ul>}
         </section>
 
-        <fieldset className="rounded-xl border p-4">
+        <fieldset className="rounded-md border border-border bg-card p-4">
           <legend className="px-1 text-sm font-medium">Node types</legend>
           <div className="grid grid-cols-2 gap-3">
             {NodeTypeSchema.options.map((type) => <label key={type} className="flex cursor-pointer items-center gap-2 text-xs capitalize">
@@ -147,8 +146,8 @@ export function GraphExplorer({ docs, historical, initialSessionId }: {
           </div>
         </fieldset>
 
-        <section className="rounded-xl border p-4" aria-live="polite" aria-label="Node details">
-          <h2 className="text-base font-semibold">{selected ? selected.label : 'Follow the evidence'}</h2>
+        <section className="rounded-md border border-border bg-card p-4" aria-live="polite" aria-label="Node details">
+          <h2 className="font-heading text-xl font-semibold">{selected ? selected.label : 'Follow the evidence'}</h2>
           {!selected ? <p className="mt-2 text-sm text-muted-foreground">Select a node for its details. Select a source block to open the cited passage.</p> : <>
             <p className="my-2 text-xs capitalize text-muted-foreground">{labelType(selected.type)}{selected.flagged ? ' · Inconsistency identified' : ''}{selected.meta.shared ? ` · Shared across ${selected.meta.sessionCount} deals` : ''}</p>
             <dl className="max-h-64 space-y-3 overflow-y-auto break-words text-sm">

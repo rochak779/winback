@@ -1,60 +1,76 @@
 # WinBack Design System (design.md)
 
-This document defines the visual language for WinBack, per ERD Part 2 §12.
+This document defines the visual language for WinBack, per ERD Part 2 §12. Tokens live in `src/app/globals.css`; fonts are loaded in `src/app/layout.tsx`.
 
-## 7. Density Stance
-**Dense and Professional.** This is a Bloomberg-like finance tool for PE professionals. We prioritize data density, readability, and information scent over airy whitespace. Component padding is compact.
+## 1. Direction: "IC Memo"
 
-## 1. Color Tokens
-Using Tailwind `hsl` values.
+WinBack should look like a well-typeset investment committee memo, not a generic SaaS dashboard. The product's promise is that every number is cited or calculated, so the interface borrows the visual language of a trusted financial document:
 
-- **Background:** `0 0% 100%` (light) / `224 71% 4%` (dark)
-- **Foreground:** `222.2 47.4% 11.2%` (light) / `213 31% 91%` (dark)
-- **Card:** `0 0% 100%` / `224 71% 4%`
-- **Card Foreground:** `222.2 47.4% 11.2%` / `213 31% 91%`
-- **Popover:** `0 0% 100%` / `224 71% 4%`
-- **Popover Foreground:** `222.2 47.4% 11.2%` / `213 31% 91%`
-- **Primary / Accent:** `222.2 47.4% 11.2%` / `210 40% 98%`
-- **Primary Foreground:** `210 40% 98%` / `222.2 47.4% 1.2%`
-- **Muted:** `210 40% 96.1%` / `223 47% 11%`
-- **Muted Foreground:** `215.4 16.3% 46.9%` / `215.4 16.3% 56.9%`
-- **Border:** `214.3 31.8% 91.4%` / `216 34% 17%`
-- **Input:** `214.3 31.8% 91.4%` / `216 34% 17%`
-- **Ring:** `222.2 84% 4.9%` / `216 34% 50%`
+- **Warm paper, deep ink.** A paper ground with navy ink, never pure white on grey.
+- **A serif voice.** Headings, key figures, pull quotes and memo text are set in a serif. UI chrome and body copy stay in a sober sans.
+- **Amber as a highlighter pen.** Evidence, gaps and "look at this" moments are marked up the way an analyst would mark a printout. Amber never means "bad".
+- **Rules, not boxes.** Sections are separated by hairlines and a heavy ink rule under each page masthead. Cards are reserved for things that are genuinely objects (a document, the memo, a form).
 
-**Semantic States (Descriptive, not evaluative):**
-- **Positive (Above Median):** `--above-median` - Blue/Cyan (`221 83% 53%` / `217 91% 60%`)
-- **Negative (Below Median):** `--below-median` - Indigo/Purple (`262 83% 58%` / `261 51% 51%`)
-- **Neutral (Inline):** `--inline-median` - Slate/Gray (`215 16% 47%` / `215 16% 57%`)
-- **Attention/Evidence (Crosscheck Flag):** `--attention` - Amber/Orange (`38 92% 50%` / `48 96% 53%`). Reads as "look at this," not "this is bad." `--attention-foreground` - `48 96% 15%` / `48 96% 85%`
+**Density stance:** dense and professional. Data density, readability and information scent beat airy whitespace inside tables and findings; generous space goes *between* sections.
 
-## 2. Typography
-- **Font Families:** 
-  - Sans: `var(--font-geist-sans)`, falling back to `Inter, ui-sans-serif, system-ui, sans-serif`.
-  - Mono: `var(--font-geist-mono)`, falling back to `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`.
-- **Financial Figures (Tabular):** Apply `tabular-nums` class to all columns of numbers (financials, benchmark table, cap table) to ensure aligned digits. Standalone large numbers (like in the Decision screen's crosscheck card) use proportional by default unless part of a grid comparison.
+## 2. Colour tokens
 
-## 3. Spacing & Layout
-- **Page Max-Width:** `max-w-6xl` (approx 1152px) for desktop-first experience.
-- **Analysis Split Ratio:** `grid-cols-12` where Benchmark is `col-span-7` and Portfolio Impact is `col-span-5` (approx 58% / 42% split) on `lg` screens.
-- **Evidence Drawer:** Width is `w-[500px]` (or `max-w-md` to `max-w-xl`). Uses overlay (Sheet component from shadcn), dimming the background slightly (`backdrop-blur-sm`).
+| Token | Light | Use |
+|---|---|---|
+| `--background` / `--paper` | `#f5f1e8` | Page ground |
+| `--card` / `--popover` | `#fbf9f3` | A sheet laid on the paper (cards, memo, drawer) |
+| `--foreground` / `--primary` / `--rule` | `#15213a` | Ink: text, primary buttons, heavy rules |
+| `--muted` / `--secondary` / `--sidebar` | `#ede7da` | Rail and quiet fills |
+| `--accent` | `#e7e0d0` | Hover fills, bar tracks |
+| `--muted-foreground` | `#5a6070` | Secondary text (≥4.5:1 on paper) |
+| `--border` | `#d9d1c0` | Hairlines |
+| `--input` | `#c9bfab` | Control borders |
+| `--destructive` | `#a3392a` | Errors only |
+| `--highlight` | `rgb(246 196 69 / .5)` | Highlighter fill: status pills, marked figures, cited passages, selection |
 
-## 4. Component Specs
-- **Stage Stepper:** Horizontal list, active stage uses `--stage-active` (Primary color, bold), completed uses `--stage-done` (Muted foreground), pending uses muted.
-- **Metric Row:** Dense table row. Target value is bold. Delta indicator uses an arrow or `+`/`-` colored by the descriptive semantic tokens (Above/Below/Inline).
-- **Concentration Bar:** Stacked bar or paired horizontal bars. Target sector uses Primary color, others use Muted.
-- **Crosscheck Finding Card:** Neutral border. The quantification grid uses `bg-muted/30` with `tabular-nums` for the figures.
-- **Evidence Chip:** Default: subtle `bg-muted text-muted-foreground border-border`. Hover: `border-attention text-attention-foreground`. Active: solid `bg-attention/20 text-attention-foreground`.
-- **Evidence Drawer:** Header with Doc title/page. Body with paragraphs. Highlighted block gets a soft `--attention` background (`bg-attention/10`). Exact quote gets a stronger `--attention` background (`bg-attention/30 font-medium`).
-- **IC Memo Surface:** `bg-background` inside a card with a subtle border. Generous line length (`max-w-none prose prose-sm`).
-- **Disabled Card ("Coming Soon"):** `opacity-50 grayscale bg-muted/50 cursor-not-allowed`.
+**Semantic states (descriptive, not evaluative):**
+- `--above-median` `#2a55b8` and `--below-median` `#6a43b5`: position against the peer median only. Always paired with an icon and a label.
+- `--inline-median` `#5a6070`.
+- `--attention` `#e0a526` with `--attention-foreground` `#5a3d04`: "look at this", never "this is bad". No red/green verdict colouring anywhere.
 
-## 5. States
-- **Loading:** Progressive reveal with `Skeleton`. For extraction, staged honest copy (e.g., "Classifying documents...", "Extracting financials...") without a single centered spinner.
-- **Empty:** Muted text, centered or aligned left depending on context. e.g. "No documents loaded."
-- **Error:** Calm inline message in a `bg-destructive/10 border-destructive/30 text-destructive` box with a 'Retry' button.
-- **MOCK Badge:** Amber badge (`bg-amber-500/20 text-amber-600 border-amber-500/30`) in header when `run.mock` is true.
+A `.dark` token set exists for completeness but no theme toggle ships today.
 
-## 6. Motion
-- **Drawer:** Standard shadcn/ui sheet transition (ease-in-out, ~300ms).
-- **Pipeline Stages:** Simple fade-in (`animate-in fade-in duration-300`) for data panels to avoid jarring pops. No heavy animations.
+## 3. Typography
+
+- **Serif (headings, figures, quotes, memo):** Source Serif 4, via `font-heading` / `font-serif`.
+- **Sans (UI and body):** IBM Plex Sans, via `font-sans`.
+- **Mono (document references, filenames, provenance hashes only):** IBM Plex Mono, via `font-mono`. Never as decoration.
+- **Scale:** page titles 40–44px serif semibold, tracking −0.02em; section titles 24px serif; finding titles 28–32px; key figures 44–52px serif with a smaller unit suffix; body 15–16px at 1.6–1.7 line height, measure capped near 70ch.
+- **Figures:** all tables get `tabular-nums lining-nums` globally. A difference between two percentages is written in **pts**.
+
+## 4. Layout
+
+- **App shell:** a 240px paper rail (`Sidebar`) with the serif wordmark, the active deal, and the pipeline stages with completion ticks and a review count. Below `md` it collapses to a horizontal strip.
+- **Content:** `max-w-6xl`, generous side padding (`px-4` → `px-16`).
+- **Page masthead:** `PageHeader` (`src/components/app-shell/page-header.tsx`): serif title, one-line standfirst, optional right-hand slot, closed by a 2px ink rule.
+- **Analysis:** benchmark and portfolio impact stack; they sit side by side (7/5) only at `2xl`.
+- **Signed-out pages:** `AuthFrame`: ink panel with the product promise beside a paper panel holding the form.
+
+## 5. Components
+
+- **Buttons:** 2–4px radius. Primary is solid ink; outline uses `--input` borders; "link" is an underlined text action. Sizes: `sm` 32px, default 36px, `lg` 44px.
+- **Crosscheck finding:** the centrepiece. Workstream and status pill above a serif title; management's claim as an italic serif pull quote with its source chip; the records as a numbered list of citations (each opens the evidence drawer); claimed / observed / gap as large serif figures, the gap marked with highlighter; for percentages, a 0–100 bar with the gap hatched in amber; suggested memo language on a card in serif; accept / dismiss / edit wording.
+- **Evidence chip:** small squared chip, sans, file icon. Hover/active fill with `--highlight`.
+- **Derived marker (ƒ):** round serif-italic marker that opens the formula and inputs.
+- **Evidence drawer:** paper header with serif document title; cited block filled with `--highlight` at 35%, exact quote marked with full highlight.
+- **IC memo:** a single sheet with a serif title, status badge (Draft / Analyst edited / Approved), serif body, and `- ` lines rendered as a real bulleted list.
+- **Audit trail:** a vertical timeline; dot colour encodes the actor (ink = analyst, amber = model, sand = system).
+- **Coming soon workstreams:** hairline-topped entries, visibly inert, labelled "Not in this release".
+
+## 6. States
+
+- **Loading:** `StatusNote`, a ruled line with a pulsing amber dot and staged, honest copy ("Classifying documents…"). Skeletons use `--accent`. Never a single centred spinner.
+- **Empty / prerequisite:** `EmptyNote`, a serif title, one line of explanation and the action that resolves it.
+- **Error:** `ErrorNote`, a calm destructive-tinted box with the message and a Retry action.
+- **Mock data:** a "Mock data" badge in the sidebar, filled with `--highlight`, whenever any stage used a mocked LLM call.
+
+## 7. Motion
+
+- Findings, panels and the memo fade in (`animate-in fade-in duration-300`).
+- The evidence drawer uses the standard sheet transition.
+- The running-stage dot pulses. No other ambient animation.
