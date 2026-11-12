@@ -35,12 +35,12 @@ export function EvidenceChip({
       onClick={() => open(refs, index)}
       aria-label={`View source evidence${label ? `: ${label}` : ''}`}
       className={cn(
-        'inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-        'bg-muted text-muted-foreground border-border hover:border-attention hover:text-attention-foreground active:bg-attention/20 active:text-attention-foreground',
+        'inline-flex items-center gap-1 rounded-xs border px-1.5 py-0.5 align-middle font-sans text-xs font-medium tracking-normal not-italic transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40',
+        'border-input bg-card text-foreground/75 hover:border-attention hover:bg-highlight hover:text-attention-foreground active:bg-highlight active:text-attention-foreground',
         className,
       )}
     >
-      <FileTextIcon className="size-3" />
+      <FileTextIcon className="size-3" aria-hidden="true" />
       {label ?? 'Evidence'}
     </button>
   );

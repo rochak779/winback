@@ -40,18 +40,18 @@ function BlockRow({ block, isCited, quote, quoteVerified }: { block: Block; isCi
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border px-3 py-2 text-sm leading-relaxed',
-        isCited ? 'border-attention/40 bg-attention/10' : 'border-transparent',
+        'rounded-sm border px-4 py-3 text-sm leading-relaxed transition-colors',
+        isCited ? 'border-attention/50 bg-highlight/35' : 'border-transparent',
       )}
     >
-      <div className="mb-1 text-xs text-muted-foreground">
+      <div className="mb-1 font-mono text-[0.6875rem] text-muted-foreground">
         {block.section ? `${block.section} · ` : ''}
         {block.page}
       </div>
       {split ? (
         <p>
           {split[0]}
-          <mark className="rounded bg-attention/30 px-0.5 font-medium text-attention-foreground">{split[1]}</mark>
+          <mark className="bg-highlight px-0.5 font-medium text-foreground">{split[1]}</mark>
           {split[2]}
         </p>
       ) : (
@@ -83,18 +83,18 @@ export function EvidenceDrawer() {
 
   return (
     <Sheet open={open} onOpenChange={(next) => !next && close()}>
-      <SheetContent className="w-full gap-0 p-0 sm:max-w-md">
+      <SheetContent className="w-full gap-0 p-0 sm:max-w-lg">
         {resolved ? (
           <>
-            <SheetHeader className="border-b">
-              <SheetTitle>{resolved.doc.title}</SheetTitle>
+            <SheetHeader className="border-b border-border bg-paper px-5 py-5">
+              <SheetTitle className="font-heading text-xl font-semibold">{resolved.doc.title}</SheetTitle>
               <SheetDescription>
                 {resolved.doc.filename} ·{' '}
                 {resolved.doc.pageNoun.charAt(0).toUpperCase() + resolved.doc.pageNoun.slice(1)} {resolved.block.page}
               </SheetDescription>
             </SheetHeader>
             {state.refs.length > 1 && (
-              <div className="flex items-center justify-between border-b px-4 py-2 text-xs text-muted-foreground">
+              <div className="flex items-center justify-between border-b border-border px-5 py-2 text-xs text-muted-foreground tabular-nums">
                 <span>
                   {state.index + 1} of {state.refs.length} citations
                 </span>
@@ -108,7 +108,7 @@ export function EvidenceDrawer() {
                 </div>
               </div>
             )}
-            <div className="flex-1 space-y-2 overflow-y-auto p-4">
+            <div className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
               {resolved.doc.blocks
                 .filter((b) => !b.deprecated)
                 .map((b) => (

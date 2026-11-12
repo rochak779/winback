@@ -12,6 +12,39 @@ import { useRun } from '@/lib/store/RunProvider';
 import { recordAuditEvent } from '@/lib/client/api';
 import type { EvidenceRef } from '@/lib/contracts/types';
 
+/** Renders the memo's markdown-lite body: paragraphs, and runs of '- ' lines as a bulleted list. */
+function MemoBody({ body }: { body: string }) {
+  const blocks: ({ kind: 'p'; text: string } | { kind: 'ul'; items: string[] })[] = [];
+  for (const raw of body.split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.startsWith('- ')) {
+      const last = blocks[blocks.length - 1];
+      if (last?.kind === 'ul') last.items.push(line.slice(2));
+      else blocks.push({ kind: 'ul', items: [line.slice(2)] });
+    } else {
+      blocks.push({ kind: 'p', text: line });
+    }
+  }
+  return (
+    <>
+      {blocks.map((block, i) =>
+        block.kind === 'p' ? (
+          <p key={i} className="mb-3 last:mb-0">
+            {block.text}
+          </p>
+        ) : (
+          <ul key={i} className="mb-3 list-disc space-y-1.5 pl-5 marker:text-muted-foreground last:mb-0">
+            {block.items.map((item, j) => (
+              <li key={j}>{item}</li>
+            ))}
+          </ul>
+        ),
+      )}
+    </>
+  );
+}
+
 function MemoSection({
   section,
   onEdit,
@@ -33,9 +66,9 @@ function MemoSection({
   }
 
   return (
-    <div className="space-y-2 border-b pb-6 mb-6 last:border-b-0 last:pb-0 last:mb-0">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold tracking-tight">{section.heading}</h3>
+    <section className="space-y-3 border-b border-border pb-8 mb-8 last:border-b-0 last:pb-0 last:mb-0">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="font-heading text-xl font-semibold tracking-[-0.01em]">{section.heading}</h3>
         {!editing && (
           <Button size="icon-sm" variant="ghost" onClick={() => setEditing(true)} aria-label="Edit section">
             <PencilIcon />
@@ -45,7 +78,7 @@ function MemoSection({
 
       {editing ? (
         <div className="space-y-3 mt-3">
-          <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={6} className="font-mono text-sm" />
+          <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={6} className="font-heading text-base leading-relaxed" />
           <div className="flex gap-2">
             <Button size="sm" onClick={saveEdit}>
               Save
@@ -56,12 +89,8 @@ function MemoSection({
           </div>
         </div>
       ) : (
-        <div className="max-w-none prose prose-sm dark:prose-invert mt-2 text-muted-foreground">
-          {section.body.split('\n').map((para, i) => (
-            <p key={i} className="mb-2 last:mb-0">
-              {para}
-            </p>
-          ))}
+        <div className="mt-2 max-w-[68ch] font-heading text-[1.0625rem] leading-[1.7] text-foreground/90">
+          <MemoBody body={section.body} />
         </div>
       )}
 
@@ -72,7 +101,7 @@ function MemoSection({
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -111,41 +140,46 @@ export function MemoCard() {
   }
 
   return (
-    <Card className="mt-8 bg-background border-border">
-      <CardHeader className="border-b pb-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <CardTitle className="text-lg">Investment Committee Memo</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Drafted based on verified findings and selected insights.
+    <Card className="mt-4 gap-0 py-0 animate-in fade-in duration-300">
+      <CardHeader className="border-b-2 border-rule px-6 pt-8 pb-6 sm:px-12 sm:pt-12">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-2">
+            <CardTitle className="font-heading text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
+              Investment Committee Memo
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {run.deal ? `${run.deal.name}. ` : ''}Drafted from verified findings and selected insights.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-background">
-              {memo.status.replace('_', ' ').toUpperCase()}
+            <Badge
+              variant="outline"
+              className={memo.status === 'approved' ? 'border-primary bg-primary text-primary-foreground' : 'bg-card'}
+            >
+              {memo.status === 'approved' ? 'Approved' : memo.status === 'analyst_edited' ? 'Analyst edited' : 'Draft'}
             </Badge>
             <Button size="sm" variant="outline" onClick={copyMemo}>
-              <CopyIcon className="mr-2 h-4 w-4" /> Copy Full Memo
+              <CopyIcon /> Copy full memo
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-0 pt-6">
+      <CardContent className="space-y-0 px-6 py-10 sm:px-12">
         {memo.sections.map((section) => (
           <MemoSection key={section.id} section={section} onEdit={editSection} />
         ))}
       </CardContent>
-      <CardFooter className="border-t flex flex-wrap items-center justify-between gap-4 py-4 mt-6">
-        <p className="text-xs text-muted-foreground max-w-lg">{memo.disclaimer}</p>
+      <CardFooter className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-6 py-5 sm:px-12">
+        <p className="max-w-lg text-xs leading-relaxed text-muted-foreground">{memo.disclaimer}</p>
         <div className="flex gap-2">
           {memo.status !== 'approved' && (
-            <Button size="sm" onClick={() => setStatus('approved')}>
-              <CheckIcon className="mr-2 h-4 w-4" /> Approve for IC
+            <Button onClick={() => setStatus('approved')}>
+              <CheckIcon /> Approve for IC
             </Button>
           )}
           {memo.status === 'approved' && (
-            <Button size="sm" variant="outline" onClick={() => setStatus('analyst_edited')}>
-              <XIcon className="mr-2 h-4 w-4" /> Revoke Approval
+            <Button variant="outline" onClick={() => setStatus('analyst_edited')}>
+              <XIcon /> Revoke approval
             </Button>
           )}
         </div>

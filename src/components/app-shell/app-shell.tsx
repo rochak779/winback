@@ -23,9 +23,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const showSidebar = !isPublicPath(pathname);
 
   return (
-    <div className="flex min-h-full flex-1">
+    <div className="flex min-h-full flex-1 flex-col md:flex-row">
       {showSidebar && <Sidebar />}
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
+      <main
+        className={
+          showSidebar
+            ? 'w-full min-w-0 flex-1 px-4 pt-8 pb-20 sm:px-8 md:px-12 md:pt-14 lg:px-16'
+            : 'flex w-full min-w-0 flex-1 flex-col'
+        }
+      >
+        {showSidebar ? <div className="mx-auto w-full max-w-6xl">{children}</div> : children}
+      </main>
     </div>
   );
 }

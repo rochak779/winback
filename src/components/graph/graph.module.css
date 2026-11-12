@@ -1,5 +1,5 @@
 .root {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
   width: 100%;
 }
 
@@ -8,7 +8,7 @@
   width: 100%;
   height: min(70vh, 48rem);
   min-height: 32rem;
-  background: var(--background);
+  background: var(--card);
   touch-action: none;
 }
 

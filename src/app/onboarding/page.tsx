@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FormError } from '@/components/app-shell/auth-frame';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,6 +32,13 @@ const DOCUMENT_ACCEPT =
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,' +
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,' +
   'application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain';
+
+const ONBOARDING_STEPS = [
+  { id: 'details', label: 'You' },
+  { id: 'company', label: 'Company' },
+  { id: 'invite', label: 'Team' },
+  { id: 'upload', label: 'Companies' },
+] as const;
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -137,10 +145,26 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg py-16">
+    <div className="mx-auto max-w-xl space-y-8 py-6">
+      <div className="space-y-4">
+        <h1 className="font-heading text-[2.5rem] leading-tight font-semibold tracking-[-0.02em]">Set up WinBack</h1>
+        <ol className="grid grid-cols-4 gap-2" aria-label="Setup progress">
+          {ONBOARDING_STEPS.map((s, i) => {
+            const current = ONBOARDING_STEPS.findIndex((x) => x.id === step);
+            return (
+              <li key={s.id} aria-current={s.id === step ? 'step' : undefined} className="space-y-2">
+                <span className={i <= current ? 'block h-1 bg-primary' : 'block h-1 bg-border'} />
+                <span className={i === current ? 'text-xs font-medium text-foreground' : 'text-xs text-muted-foreground'}>
+                  {s.label}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-2xl">
             {step === 'details' && 'Your details'}
             {step === 'company' && 'Company details'}
             {step === 'invite' && 'Invite teammates'}
@@ -149,23 +173,23 @@ export default function OnboardingPage() {
         </CardHeader>
         <CardContent>
           {step === 'details' && (
-            <form className="space-y-4" onSubmit={handleDetails}>
+            <form className="space-y-5" onSubmit={handleDetails}>
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full name</Label>
                 <Input id="fullName" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <FormError>{error}</FormError>}
               <Button type="submit">Continue</Button>
             </form>
           )}
 
           {step === 'company' && (
-            <form className="space-y-4" onSubmit={handleCompany}>
+            <form className="space-y-5" onSubmit={handleCompany}>
               <div className="space-y-2">
                 <Label htmlFor="orgName">Company name</Label>
                 <Input id="orgName" required value={orgName} onChange={(e) => setOrgName(e.target.value)} />
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <FormError>{error}</FormError>}
               <Button type="submit">Continue</Button>
             </form>
           )}
@@ -185,13 +209,13 @@ export default function OnboardingPage() {
               </div>
               <ul className="space-y-1 text-sm">
                 {invites.map((invite) => (
-                  <li key={invite.link} className="flex flex-col gap-1 rounded border p-2">
+                  <li key={invite.link} className="flex flex-col gap-1 rounded-sm border border-border bg-paper p-3">
                     <span>{invite.email} — {invite.role}</span>
                     <code className="break-all text-xs text-muted-foreground">{invite.link}</code>
                   </li>
                 ))}
               </ul>
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <FormError>{error}</FormError>}
               <div className="flex justify-between">
                 <Button variant="outline" onClick={() => setStep('upload')}>Skip</Button>
                 <Button onClick={() => setStep('upload')}>Continue</Button>
@@ -200,7 +224,7 @@ export default function OnboardingPage() {
           )}
 
           {step === 'upload' && (
-            <form className="space-y-4" onSubmit={handleFinish}>
+            <form className="space-y-5" onSubmit={handleFinish}>
               <div className="space-y-2">
                 <Label htmlFor="companyName">Add a company to track (optional)</Label>
                 <div className="flex gap-2">
@@ -223,7 +247,7 @@ export default function OnboardingPage() {
               {trackedCompanies.length > 0 && (
                 <ul className="space-y-3">
                   {trackedCompanies.map((company) => (
-                    <li key={company.id} className="space-y-2 rounded border p-3">
+                    <li key={company.id} className="space-y-2 rounded-sm border border-border bg-paper p-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-medium">{company.name}</span>
                         <Input
@@ -248,7 +272,7 @@ export default function OnboardingPage() {
                 </ul>
               )}
 
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <FormError>{error}</FormError>}
               <Button type="submit">Finish</Button>
             </form>
           )}

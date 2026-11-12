@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AuthFrame, FormError } from '@/components/app-shell/auth-frame';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { acceptInvite, getInvitePreview, type InvitePreview } from '@/lib/org/invites';
 
@@ -35,25 +35,26 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
 
   if (preview === 'loading') return null;
   if (preview === null) {
-    return <div className="mx-auto max-w-sm py-16 text-center text-sm text-muted-foreground">This invite link is invalid or has expired.</div>;
+    return (
+      <AuthFrame title="Invite not found" description="This invite link is invalid or has expired. Ask the person who invited you for a new one.">
+        <a href="/sign-in" className="text-sm text-foreground underline decoration-foreground/30 hover:decoration-foreground">
+          Go to sign in
+        </a>
+      </AuthFrame>
+    );
   }
 
   return (
-    <div className="mx-auto flex max-w-sm flex-col justify-center py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle>Join {preview.orgName}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <AuthFrame title={<>Join {preview.orgName}</>}>
+        <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
             You&apos;ve been invited as {preview.role === 'admin' ? 'an admin' : 'a member'}.
           </p>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button className="w-full" onClick={handleAccept} disabled={preview.status !== 'pending'}>
+          {error && <FormError>{error}</FormError>}
+          <Button size="lg" className="w-full" onClick={handleAccept} disabled={preview.status !== 'pending'}>
             {preview.status === 'pending' ? 'Accept invite' : 'Already accepted'}
           </Button>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </AuthFrame>
   );
 }

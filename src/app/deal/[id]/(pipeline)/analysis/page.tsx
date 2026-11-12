@@ -14,14 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BenchmarkPanel } from '@/components/analysis/benchmark-panel';
 import { PortfolioPanel } from '@/components/analysis/portfolio-panel';
+import { EmptyNote, ErrorNote, PageHeader } from '@/components/app-shell/page-header';
 import { runBenchmark, runPortfolio } from '@/lib/client/api';
 import { useRun, useStage } from '@/lib/store/RunProvider';
 
 function PanelSkeleton() {
   return (
-    <div className="space-y-3 rounded-lg border p-4">
-      <Skeleton className="h-5 w-32" />
-      <Skeleton className="h-32 w-full" />
+    <div className="space-y-4 border-t-2 border-rule pt-5" role="status" aria-label="Loading">
+      <Skeleton className="h-7 w-40" />
+      <Skeleton className="h-40 w-full" />
       <Skeleton className="h-16 w-full" />
     </div>
   );
@@ -29,12 +30,14 @@ function PanelSkeleton() {
 
 function ErrorPanel({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-      <p>{message}</p>
-      <Button variant="outline" size="sm" onClick={onRetry}>
-        Retry
-      </Button>
-    </div>
+    <ErrorNote
+      message={message}
+      action={
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          Retry
+        </Button>
+      }
+    />
   );
 }
 
@@ -68,26 +71,33 @@ export default function AnalysisPage() {
 
   if (!profile || dealSizeUsdM === null) {
     return (
-      <div className="flex flex-col items-start gap-3">
-        <p className="text-sm text-muted-foreground">Run extraction first — benchmarking needs the extracted profile.</p>
-        <Button nativeButton={false} render={<Link href={`/deal/${run.id}/ingest`} />}>
-          Go to Ingest
-        </Button>
-      </div>
+      <EmptyNote
+        title="Nothing to benchmark yet"
+        action={
+          <Button nativeButton={false} render={<Link href={`/deal/${run.id}/ingest`} />}>
+            Go to Ingest
+          </Button>
+        }
+      >
+        Run extraction first. Benchmarking needs the extracted profile.
+      </EmptyNote>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-xl font-semibold tracking-tight">Benchmark + Portfolio Impact</h1>
-        <p className="text-sm text-muted-foreground">
-          How {profile.name} compares against three peers, and what this deal does to the fund&apos;s sector concentration.
-        </p>
-      </div>
+    <div className="space-y-12">
+      <PageHeader
+        title="Analysis"
+        description={
+          <>
+            How {profile.name} compares against three peers, and what this deal does to the fund&apos;s sector
+            concentration.
+          </>
+        }
+      />
 
-      <div className="grid gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-7">
+      <div className="grid gap-x-12 gap-y-14 2xl:grid-cols-12">
+        <div className="min-w-0 2xl:col-span-7">
           {benchmarkStage.status === 'running' && <PanelSkeleton />}
           {benchmarkStage.status === 'error' && (
             <ErrorPanel message={benchmarkStage.error?.message ?? 'Benchmark failed.'} onRetry={startBenchmark} />
@@ -95,7 +105,7 @@ export default function AnalysisPage() {
           {run.benchmark && benchmarkStage.status === 'done' && <BenchmarkPanel benchmark={run.benchmark} />}
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="min-w-0 2xl:col-span-5">
           {portfolioStage.status === 'running' && <PanelSkeleton />}
           {portfolioStage.status === 'error' && (
             <ErrorPanel message={portfolioStage.error?.message ?? 'Portfolio impact failed.'} onRetry={startPortfolio} />
@@ -105,9 +115,11 @@ export default function AnalysisPage() {
       </div>
 
       {benchmarkStage.status === 'done' && portfolioStage.status === 'done' && (
-        <Button nativeButton={false} render={<Link href={`/deal/${run.id}/decision`} />}>
-          Continue to decision →
-        </Button>
+        <div className="border-t border-border pt-6">
+          <Button size="lg" nativeButton={false} render={<Link href={`/deal/${run.id}/decision`} />}>
+            Continue to decision →
+          </Button>
+        </div>
       )}
     </div>
   );

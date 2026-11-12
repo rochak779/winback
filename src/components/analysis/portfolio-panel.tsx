@@ -7,7 +7,6 @@
 // takeaway and should be readable from across a room.
 // ============================================================================
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DerivedMarker } from '@/components/audit/derived-marker';
 import { cn } from '@/lib/utils';
@@ -25,9 +24,9 @@ function ConcentrationBar({ label, pct, emphasized }: { label: string; pct: numb
   return (
     <div className="flex items-center gap-2">
       <span className="w-12 shrink-0 text-xs text-muted-foreground">{label}</span>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+      <div className="h-2 flex-1 overflow-hidden bg-accent">
         <div
-          className={cn('h-full rounded-full', emphasized ? 'bg-primary' : 'bg-muted-foreground')}
+          className={cn('h-full', emphasized ? 'bg-primary' : 'bg-input')}
           style={{ width: `${Math.min(pct, 100)}%` }}
         />
       </div>
@@ -38,12 +37,14 @@ function ConcentrationBar({ label, pct, emphasized }: { label: string; pct: numb
 
 export function PortfolioPanel({ portfolio }: { portfolio: PortfolioImpact }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Portfolio impact</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {portfolio.headline && <p className="font-heading text-xl leading-snug font-semibold tracking-tight">{portfolio.headline}</p>}
+    <section className="space-y-5 border-t-2 border-rule pt-5 animate-in fade-in duration-300">
+      <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Portfolio impact</h2>
+      <div className="space-y-6">
+        {portfolio.headline && (
+          <p className="font-heading text-[1.375rem] leading-snug font-medium tracking-[-0.01em] italic">
+            {portfolio.headline}
+          </p>
+        )}
 
         <div className="overflow-x-auto">
           <Table>
@@ -68,22 +69,22 @@ export function PortfolioPanel({ portfolio }: { portfolio: PortfolioImpact }) {
           </Table>
         </div>
 
-        <div className="space-y-3 border-t pt-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-muted-foreground">Sector concentration of committed capital</p>
+        <div className="space-y-4 border-t border-border pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[0.8125rem] font-semibold text-muted-foreground">Sector concentration of committed capital</p>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1">
-                <span className="size-2 rounded-full bg-muted-foreground" /> Before
+                <span className="size-2 bg-input" /> Before
               </span>
               <span className="inline-flex items-center gap-1">
-                <span className="size-2 rounded-full bg-primary" /> After (target sector)
+                <span className="size-2 bg-primary" /> After (target sector)
               </span>
             </div>
           </div>
 
           <div className="space-y-3">
             {portfolio.concentrations.map((c) => (
-              <div key={c.sector} className={cn('space-y-1 rounded-lg px-2 py-1.5', c.isTargetSector && 'bg-muted/50 ring-1 ring-border')}>
+              <div key={c.sector} className={cn('space-y-1.5 px-2 py-2', c.isTargetSector && '-mx-0 bg-card shadow-sheet ring-1 ring-border')}>
                 <div className="flex items-center justify-between">
                   <span className={cn('inline-flex items-center gap-1.5 text-sm', c.isTargetSector ? 'font-semibold' : 'text-muted-foreground')}>
                     {c.sector}
@@ -96,7 +97,7 @@ export function PortfolioPanel({ portfolio }: { portfolio: PortfolioImpact }) {
                     />
                   </span>
                   {c.isTargetSector && (
-                    <span className="text-xs font-medium tabular-nums text-primary">
+                    <span className="font-heading text-base font-semibold tabular-nums text-foreground">
                       {c.deltaPct >= 0 ? '+' : ''}
                       {fmtPct(c.deltaPct)}
                     </span>
@@ -108,7 +109,7 @@ export function PortfolioPanel({ portfolio }: { portfolio: PortfolioImpact }) {
             ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

@@ -8,7 +8,6 @@
 // screen (Part 6 §6.5, §6.7).
 // ============================================================================
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { EvidenceValue } from '@/components/evidence/evidence-chip';
 import type { CompanyProfile } from '@/lib/contracts/types';
@@ -23,13 +22,11 @@ function fmtPct(n: number | null): string {
 
 export function ProfileView({ profile }: { profile: CompanyProfile }) {
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{profile.name}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-4">
+    <div className="space-y-12">
+      <section className="space-y-4 border-t-2 border-rule pt-5">
+        <h2 className="font-heading text-3xl font-semibold tracking-[-0.015em]">{profile.name}</h2>
+        <div className="space-y-3">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
             <div>
               <dt className="text-xs text-muted-foreground">Sector</dt>
               <dd>{profile.sector}</dd>
@@ -47,15 +44,13 @@ export function ProfileView({ profile }: { profile: CompanyProfile }) {
               <dd className="tabular-nums">{profile.employees ?? '—'}</dd>
             </div>
           </dl>
-          <p className="text-sm text-muted-foreground">{profile.businessSummary}</p>
-        </CardContent>
-      </Card>
+          <p className="max-w-[70ch] font-heading text-[1.0625rem] leading-relaxed">{profile.businessSummary}</p>
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Financials</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="space-y-4 border-t-2 border-rule pt-5">
+        <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Financials</h2>
+        <div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -80,32 +75,28 @@ export function ProfileView({ profile }: { profile: CompanyProfile }) {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {profile.revenueMix.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue mix</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-4">
+        <section className="space-y-4 border-t-2 border-rule pt-5">
+          <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Revenue mix</h2>
+          <div className="flex flex-wrap gap-x-10 gap-y-4">
             {profile.revenueMix.map((item) => (
               <div key={item.label} className="text-sm">
                 <div className="text-xs text-muted-foreground">{item.label}</div>
-                <div className="tabular-nums">
+                <div className="font-heading text-2xl font-medium tabular-nums">
                   <EvidenceValue value={fmtPct(item.pct)} refs={item.evidence} />
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Customer contracts</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="space-y-4 border-t-2 border-rule pt-5">
+        <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Customer contracts</h2>
+        <div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -130,14 +121,12 @@ export function ProfileView({ profile }: { profile: CompanyProfile }) {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Cap table</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <section className="space-y-4 border-t-2 border-rule pt-5">
+        <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Cap table</h2>
+        <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Stated fully diluted shares:{' '}
             <span className="tabular-nums text-foreground">
@@ -166,14 +155,12 @@ export function ProfileView({ profile }: { profile: CompanyProfile }) {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Option grants</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="space-y-4 border-t-2 border-rule pt-5">
+        <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Option grants</h2>
+        <div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -196,23 +183,21 @@ export function ProfileView({ profile }: { profile: CompanyProfile }) {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {profile.keyTerms.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Key terms</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
+        <section className="space-y-4 border-t-2 border-rule pt-5">
+          <h2 className="font-heading text-2xl font-semibold tracking-[-0.01em]">Key terms</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
             {profile.keyTerms.map((term) => (
               <div key={term.label} className="text-sm">
                 <div className="text-xs text-muted-foreground">{term.label}</div>
                 <EvidenceValue value={term.value} refs={term.evidence} />
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       )}
     </div>
   );

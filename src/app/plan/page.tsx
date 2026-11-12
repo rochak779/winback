@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/app-shell/page-header';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TARGET_COMPANY_IDENTITY } from '@/data/target';
@@ -27,21 +28,6 @@ const THESIS_PRESETS = [
   "Bolt-on candidate for our existing outpatient healthcare portfolio: assess overlap with current holdings, pricing power with payers, and whether reported growth is organic or acquisition-driven.",
   "Standalone platform investment — underwrite on recurring revenue quality, cap table cleanliness ahead of a Series-style raise, and readiness for a buy-and-build strategy in the Southeast.",
 ];
-
-function IdentityBlock() {
-  return (
-    <div className="mb-8 max-w-2xl space-y-2">
-      <h1 className="font-heading text-2xl font-semibold tracking-tight">WinBack</h1>
-      <p className="text-sm text-muted-foreground">
-        Autonomous first-pass diligence for PE deal teams. Load a target&apos;s documents and WinBack{' '}
-        <strong className="text-foreground">extracts</strong> a structured profile,{' '}
-        <strong className="text-foreground">benchmarks</strong> it against peers and your portfolio, and{' '}
-        <strong className="text-foreground">cross-checks</strong> management&apos;s claims against the underlying evidence
-        — every statement linked back to its source.
-      </p>
-    </div>
-  );
-}
 
 export default function PlanPage() {
   const router = useRouter();
@@ -82,15 +68,25 @@ export default function PlanPage() {
   }
 
   return (
-    <div>
-      <IdentityBlock />
-      <Card className="max-w-2xl">
+    <div className="space-y-10">
+      <PageHeader
+        title="New deal"
+        description={
+          <>
+            Load a target&apos;s documents and WinBack <strong className="font-semibold text-foreground">extracts</strong> a
+            structured profile, <strong className="font-semibold text-foreground">benchmarks</strong> it against peers and
+            your portfolio, and <strong className="font-semibold text-foreground">cross-checks</strong> management&apos;s
+            claims against the underlying evidence, with every statement linked back to its source.
+          </>
+        }
+      />
+      <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle>Create deal</CardTitle>
+          <CardTitle className="text-2xl">Create deal</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="deal-name">Deal codename</Label>
                 <Input id="deal-name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -128,14 +124,22 @@ export default function PlanPage() {
               <Textarea id="thesis" value={thesis} onChange={(e) => setThesis(e.target.value)} rows={4} required />
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {THESIS_PRESETS.map((preset, i) => (
-                  <Button key={i} type="button" variant="outline" size="xs" onClick={() => setThesis(preset)}>
+                  <Button
+                    key={i}
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    aria-pressed={thesis === preset}
+                    className="aria-pressed:border-foreground aria-pressed:bg-accent"
+                    onClick={() => setThesis(preset)}
+                  >
                     Preset {i + 1}
                   </Button>
                 ))}
               </div>
             </div>
 
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" size="lg" disabled={isPending}>
               {isPending ? 'Creating deal…' : 'Create deal →'}
             </Button>
           </form>

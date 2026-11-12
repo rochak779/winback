@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AuthFrame, FormError } from '@/components/app-shell/auth-frame';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
@@ -44,33 +44,26 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-sm flex-col justify-center py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle>Set a new password</CardTitle>
-        </CardHeader>
-        <CardContent>
+    <AuthFrame title={<>Set a new password</>}>
           {hasSession === null && <p className="text-sm text-muted-foreground">Checking your reset link…</p>}
           {hasSession === false && (
             <p className="text-sm text-muted-foreground">
               This link must be opened in the same browser you requested it from.{' '}
-              <a href="/forgot-password" className="underline">Request a new link.</a>
+              <a href="/forgot-password" className="text-foreground underline decoration-foreground/30 hover:decoration-foreground">Request a new link.</a>
             </p>
           )}
           {hasSession === true && (
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="password">New password</Label>
               <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={pending}>
+            {error && <FormError>{error}</FormError>}
+            <Button type="submit" size="lg" className="w-full" disabled={pending}>
               {pending ? 'Saving…' : 'Save new password'}
             </Button>
           </form>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </AuthFrame>
   );
 }

@@ -9,19 +9,16 @@
 // ============================================================================
 
 import { AuditTimeline } from '@/components/audit/audit-timeline';
+import { PageHeader } from '@/components/app-shell/page-header';
 
 export default async function AuditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">Audit trail</h1>
-        <p className="text-sm text-muted-foreground">
-          A complete, exportable record of what was generated, from what sources, by what model and prompt version, and
-          what the analyst did about it. Not tamper-proof and not a compliance-grade log — see the README for the exact
-          claim this makes.
-        </p>
-      </div>
+    <div className="space-y-10">
+      <PageHeader
+        title="Audit trail"
+        description="A complete, exportable record of what was generated, from what sources, by what model and prompt version, and what the analyst did about it. Not tamper-proof and not a compliance-grade log — see the README for the exact claim this makes."
+      />
       <AuditTimeline runId={id} />
     </div>
   );
