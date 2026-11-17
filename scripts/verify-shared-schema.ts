@@ -111,6 +111,11 @@ async function main() {
     assert(missing === '', `RLS off on: ${missing}`);
   });
 
+  await check('_migrations is locked to the API', () => {
+    assert(sql(`select rowsecurity from pg_tables where schemaname = '${SCHEMA}' and tablename = '_migrations'`) === 't', 'RLS off on _migrations');
+    assert(sql(`select has_table_privilege('anon', '${SCHEMA}._migrations', 'select')`) === 'f', 'anon can read _migrations');
+  });
+
   // --- Behaviour checks through the API, as real users ------------------------
   const userIds: string[] = [];
   let orgA: string | undefined;

@@ -140,7 +140,11 @@ PSQL=(psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -X -q)
   create table if not exists ${APP}._migrations (
     version text primary key,
     applied_at timestamptz not null default now()
-  );"
+  );
+  -- The schema's default grants would otherwise expose migration history
+  -- through the public API; RLS with no policies denies every API caller.
+  alter table ${APP}._migrations enable row level security;
+  revoke all on ${APP}._migrations from anon, authenticated;"
 
 for file in supabase/migrations/*.sql; do
   version="$(basename "$file" .sql)"
@@ -307,7 +311,7 @@ The shared database has never run this app's migrations, so the existing files m
 
 ### Step 7 — Verify
 - [ ] `select tablename from pg_tables where schemaname = 'public';` shows **nothing from this app**.
-- [ ] `select tablename, rowsecurity from pg_tables where schemaname = '<app>';` shows RLS enabled on every table except `_migrations`.
+- [ ] `select tablename, rowsecurity from pg_tables where schemaname = '<app>';` shows RLS enabled on **every** table, including `_migrations`.
 - [ ] `select jobname from cron.job;` shows only prefixed jobs for this app.
 - [ ] Running `db:migrate` a second time prints only "up to date".
 - [ ] The app's test suite passes against the shared project.
