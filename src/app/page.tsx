@@ -55,6 +55,13 @@ export default function LandingPage() {
           </dl>
         </div>
       </main>
+
+      <footer className="px-6 pb-8 text-sm text-muted-foreground sm:px-10 lg:px-16">
+        Built by{' '}
+        <a href="https://www.rochakagarwal.com" className="underline underline-offset-4 hover:text-foreground">
+          Rochak Agarwal
+        </a>
+      </footer>
     </div>
   );
 }
