@@ -61,3 +61,7 @@ Next.js (App Router), TypeScript, Tailwind CSS with shadcn/ui, Supabase (Auth, P
 WinBack runs on a Supabase project shared with other hobby apps, inside its own `winback` schema, with documents in the `winback-documents` storage bucket. Apply migrations only with `pnpm db:migrate`, never `supabase db push`. The rules every app on the shared project follows are in [`docs/shared-supabase-db.md`](docs/shared-supabase-db.md).
 
 </details>
+
+---
+
+Built by [Rochak Agarwal](https://www.rochakagarwal.com). Read the full case study: [WinBack on rochakagarwal.com](https://www.rochakagarwal.com/projects/winback).
